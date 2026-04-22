@@ -48,8 +48,8 @@ std::string get_log_file_path() {
     return (dir / (std::string(month) + ".txt")).string();
 }
 
-// Fetch text from X11 selection via xclip
-std::string get_x11_selection(const std::string& selection_type) {
+// Fetch text from system selection (X11 via xclip on Linux)
+std::string get_system_selection(const std::string& selection_type) {
     char buffer[128];
     std::string result = "";
 
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Arguments parsed. mode=" << mode
               << ", poll_interval_ms=" << poll_interval_ms << std::endl;
 
-    std::cout << "x11-selection-logger started in " << mode << " mode." << std::endl;
+    std::cout << "selection-logger started in " << mode << " mode." << std::endl;
     std::cout << "Polling interval: " << poll_interval_ms << " ms" << std::endl;
 
     if (mode == "primary") {
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         if (mode == "primary" || mode == "hybrid") {
-            std::string current_primary = get_x11_selection("primary");
+            std::string current_primary = get_system_selection("primary");
             if (current_primary != last_primary &&
                 !current_primary.empty() &&
                 current_primary.find_first_not_of(" \t\n\r") != std::string::npos) {
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
         }
 
         if (mode == "clipboard" || mode == "hybrid") {
-            std::string current_clipboard = get_x11_selection("clipboard");
+            std::string current_clipboard = get_system_selection("clipboard");
             if (current_clipboard != last_clipboard &&
                 !current_clipboard.empty() &&
                 current_clipboard.find_first_not_of(" \t\n\r") != std::string::npos) {

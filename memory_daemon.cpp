@@ -30,8 +30,8 @@ std::string get_log_file_path() {
     return (dir / (std::string(month) + ".txt")).string();
 }
 
-// Fetch text from X11 primary selection via xclip
-std::string get_x11_selection() {
+// Fetch text from system primary selection (X11 via xclip on Linux)
+std::string get_system_selection() {
     char buffer[128];
     std::string result = "";
     
@@ -69,14 +69,14 @@ int main() {
                  False, GrabModeAsync, GrabModeAsync);
     }
 
-    std::cout << "x11-selection-logger started. Press Ctrl+M to save selection." << std::endl;
+    std::cout << "selection-logger started. Press Ctrl+M to save selection." << std::endl;
 
     XEvent ev;
     while (true) {
         XNextEvent(display, &ev);
 
         if (ev.type == KeyPress && ev.xkey.keycode == key) {
-            std::string text = get_x11_selection(); 
+            std::string text = get_system_selection(); 
             
             // Skip if selection is empty or only whitespace
             if (text.empty() || text.find_first_not_of(" \t\n\r") == std::string::npos) {
