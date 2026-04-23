@@ -5,12 +5,11 @@
 #include <string>
 #include <chrono>
 #include <ctime>
-#include <filesystem>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
 #include <csignal>
-
-namespace fs = std::filesystem;
 
 // X error handler
 int x_error_handler(Display* display, XErrorEvent* event) {
@@ -39,13 +38,24 @@ std::string get_log_file_path() {
     std::strftime(year, sizeof(year), "%Y", lt);
     std::strftime(month, sizeof(month), "%m", lt);
 
-    fs::path dir = fs::path(get_base_dir()) / year;
-    try {
-        fs::create_directories(dir);
-    } catch (const fs::filesystem_error& e) {
-        std::cerr << "Error: Cannot create directory: " << e.what() << std::endl;
+    // Create directory using POSIX functions
+    std::string base_dir = get_base_dir();
+    std::string dir_path = base_dir + "/" + year;
+
+    // Create directory if it doesn't exist
+    struct stat st;
+    if (stat(dir_path.c_str(), &st) == -1) {
+        // Create parent directory first
+        if (mkdir(base_dir.c_str(), 0755) == -1 && errno != EEXIST) {
+            std::cerr << "Error: Cannot create base directory: " << strerror(errno) << std::endl;
+        }
+        // Create year directory
+        if (mkdir(dir_path.c_str(), 0755) == -1 && errno != EEXIST) {
+            std::cerr << "Error: Cannot create year directory: " << strerror(errno) << std::endl;
+        }
     }
-    return (dir / (std::string(month) + ".txt")).string();
+
+    return dir_path + "/" + month + ".txt";
 }
 
 // Fetch text from system selection (X11 via xclip on Linux)

@@ -1,3 +1,6 @@
+// DEPRECATED: Manual mode (Ctrl+M) is deprecated. Use selection-logger-auto instead.
+// This file will be removed in a future version.
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <iostream>
@@ -5,10 +8,10 @@
 #include <string>
 #include <chrono>
 #include <ctime>
-#include <filesystem>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
-
-namespace fs = std::filesystem;
+#include <cstring>
 
 // Base directory for logs
 const std::string BASE_DIR = std::string(getenv("HOME")) + "/memories";
@@ -21,13 +24,23 @@ std::string get_log_file_path() {
     std::strftime(year, sizeof(year), "%Y", lt);
     std::strftime(month, sizeof(month), "%m", lt);
 
-    fs::path dir = fs::path(BASE_DIR) / year;
-    try {
-        fs::create_directories(dir);
-    } catch (const fs::filesystem_error& e) {
-        std::cerr << "Error: Cannot create directory: " << e.what() << std::endl;
+    // Create directory using POSIX functions (compatible with older compilers)
+    std::string dir_path = std::string(BASE_DIR) + "/" + year;
+
+    // Create directory if it doesn't exist
+    struct stat st;
+    if (stat(dir_path.c_str(), &st) == -1) {
+        // Create parent directory first
+        if (mkdir(BASE_DIR.c_str(), 0755) == -1 && errno != EEXIST) {
+            std::cerr << "Error: Cannot create base directory: " << strerror(errno) << std::endl;
+        }
+        // Create year directory
+        if (mkdir(dir_path.c_str(), 0755) == -1 && errno != EEXIST) {
+            std::cerr << "Error: Cannot create year directory: " << strerror(errno) << std::endl;
+        }
     }
-    return (dir / (std::string(month) + ".txt")).string();
+
+    return dir_path + "/" + month + ".txt";
 }
 
 // Fetch text from system primary selection (X11 via xclip on Linux)
@@ -53,6 +66,10 @@ std::string get_system_selection() {
 }
 
 int main() {
+    std::cerr << "WARNING: Manual mode (Ctrl+M) is DEPRECATED." << std::endl;
+    std::cerr << "Use 'selection-logger-auto' for automatic monitoring instead." << std::endl;
+    std::cerr << "This version will be removed in a future release." << std::endl;
+
     Display* display = XOpenDisplay(NULL);
     if (!display) {
         std::cerr << "Error: Unable to open X display" << std::endl;
@@ -69,7 +86,7 @@ int main() {
                  False, GrabModeAsync, GrabModeAsync);
     }
 
-    std::cout << "selection-logger started. Press Ctrl+M to save selection." << std::endl;
+    std::cout << "DEPRECATED: selection-logger started. Press Ctrl+M to save selection." << std::endl;
 
     XEvent ev;
     while (true) {

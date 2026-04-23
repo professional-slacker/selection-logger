@@ -1,6 +1,7 @@
 #include "platform.h"
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 
 bool is_running_under_wine() {
 #if PLATFORM_LINUX

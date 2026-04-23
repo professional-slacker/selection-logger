@@ -4,14 +4,12 @@
 A lightweight cross-platform daemon that automatically captures system text selections (clipboard) and saves them to dated log files.
 
 ## ✨ Features
-- **Cross-platform**: Windows and Linux (Wine test compatible)
-- **Automatic Capture Only**: Saves text selections automatically when they change
+- **Automatic Capture**: Saves text selections automatically when they change (no manual trigger needed)
 - **Dual Selection Monitoring**: Monitors both PRIMARY (mouse selection) and CLIPBOARD (Ctrl+C) selections
 - **Smart Organization**: Automatically categorizes logs into `~/memories/Year/Month.txt`
 - **Low Overhead**: A minimal background process designed for cross-platform environments
 - **Timestamped**: Every entry is recorded with a precise timestamp for later reference
 - **Configurable**: Multiple monitoring modes and adjustable polling interval
-- **Static Linking**: No external DLL dependencies (Windows)
 
 ## 📋 Prerequisites
 
@@ -29,23 +27,10 @@ Coming soon...
 Coming soon...
 
 ## 🛠 Installation & Build
-
-### Cross-platform Build System
-This project uses a Makefile for cross-platform compilation supporting Linux, Windows, and Wine testing.
+Clone this repository and compile the source code using `g++`.
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/selection-logger.git
-cd selection-logger
-
-# Build for Linux (X11)
-make clean && make PLATFORM=linux
-
-# Build for Windows (statically linked, no DLL dependencies)
-make clean && make PLATFORM=windows STATIC=1
-
-# Build for release (statically linked Windows, optimized)
-make clean && make release PLATFORM=windows
+g++ -o selection-logger-auto memory_daemon_auto.cpp -lX11
 ```
 
 ## 🚀 Usage
@@ -113,14 +98,8 @@ Another important text snippet.
 
 ## 🔧 Technical Details
 
-### Cross-platform Architecture
-- **Linux/X11**: Uses xclip command-line tool for clipboard access
-- **Windows**: Uses Win32 API (OpenClipboard, GetClipboardData)
-- **Wine Testing**: Windows executables can be tested on Linux using Wine
-- **Static Linking**: Windows builds are statically linked (no external DLL dependencies)
-
 ### How It Works
-1. Uses platform-specific tools to access system selections
+1. Uses platform-specific tools to access system selections (xclip on Linux/X11)
 2. Polls selections at configurable intervals (default: 1 second)
 3. Detects changes by comparing with previous selection content
 4. Skips empty or whitespace-only selections
@@ -144,34 +123,8 @@ Another important text snippet.
 
 4. **File Operations**: File copies are logged as file URIs (e.g., `file:///path/to/file.txt`).
 
-## 🌐 Platform Support
-
-### Linux (X11)
-- **Dependencies**: `libx11-dev`, `xclip`
-- **Install**: `sudo apt-get install libx11-dev xclip` (Ubuntu/Debian)
-- **Build**: `make PLATFORM=linux`
-- **Run**: `./selection-logger-auto [options]`
-
-### Windows
-- **Build**: `make PLATFORM=windows STATIC=1`
-- **Output**: `selection-logger-auto.exe` (statically linked)
-- **Run**: `selection-logger-auto.exe [options]`
-- **Features**: No external DLL dependencies, Win32 API
-
-### Wine Testing Environment
-- **Purpose**: Test Windows builds on Linux during development
-- **Test Script**: `./test_wine_auto.sh`
-- **Requirements**: Wine installed (`sudo apt-get install wine`)
-- **Benefits**: Cross-platform compatibility verification
-
-### Development Workflow
-1. **Code**: Write cross-platform C++ code
-2. **Build**: `make PLATFORM=windows STATIC=1`
-3. **Test**: `./test_wine_auto.sh` (Wine testing)
-4. **Deploy**: Package for Windows and Linux
-
-## 📄 Legacy Version (DEPRECATED)
-The original manual mode version (`memory_daemon.cpp`) with Ctrl+M trigger is deprecated and will be removed in a future version. Use `selection-logger-auto` for automatic monitoring instead.
+## 📄 Legacy Version
+The original manual mode version (`memory_daemon.cpp`) with Ctrl+M trigger is still available but deprecated in favor of the automatic version.
 
 ## License
 MIT License
