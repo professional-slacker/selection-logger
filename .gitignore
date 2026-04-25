@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+# Internal documents
+*レポート*.md
+*報告書*.md
