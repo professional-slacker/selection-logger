@@ -1,7 +1,7 @@
 ```markdown
 # selection-logger
 
-A lightweight cross-platform daemon that automatically captures system text selections (clipboard) and saves them to dated log files.
+A lightweight cross-platform daemon that monitors system text selections and automatically logs changes to dated files.
 
 ## ✨ Features
 - **Cross-platform**: Windows and Linux (Wine test compatible)
