@@ -23,10 +23,16 @@ sudo apt install libx11-dev xclip
 ```
 
 ### Windows
-Coming soon...
+Windows 7 or later (using Win32 API, no additional dependencies required).
+Build with MinGW-w64 (cross-compilation from Linux) or MSVC on Windows.
+```bash
+# Cross-compile from Linux with MinGW-w64
+sudo apt install g++-mingw-w64-x86-64
+make PLATFORM=windows STATIC=1
+```
 
 ### macOS
-Coming soon...
+Not yet supported.
 
 ## 🛠 Installation & Build
 
