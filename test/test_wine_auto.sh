@@ -35,15 +35,15 @@ wine selection-logger.exe --help
 echo ""
 echo "2. Testing different modes:"
 echo "   a) --primary mode (mouse selection):"
-wine selection-logger.exe --primary --version 2>&1 | head -5 || true
+timeout 3 wine selection-logger.exe --primary --interval 1000 2>&1 || true
 
 echo ""
 echo "   b) --clipboard mode (Ctrl+C):"
-wine selection-logger.exe --clipboard --version 2>&1 | head -5 || true
+timeout 3 wine selection-logger.exe --clipboard --interval 1000 2>&1 || true
 
 echo ""
 echo "   c) --both mode (default):"
-wine selection-logger.exe --both --version 2>&1 | head -5 || true
+timeout 3 wine selection-logger.exe --both --interval 1000 2>&1 || true
 
 echo ""
 echo "3. Testing interval option:"

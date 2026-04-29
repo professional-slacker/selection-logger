@@ -33,8 +33,8 @@ echo "1. Testing --help option:"
 wine selection-logger.exe --help
 
 echo ""
-echo "2. Testing basic execution:"
-wine selection-logger.exe --version 2>&1 || echo "Version check completed"
+echo "2. Testing basic execution (3 second run):"
+timeout 3 wine selection-logger.exe --both --interval 1000 2>&1 || true
 
 echo ""
 echo "3. Testing DLL dependencies:"
