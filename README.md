@@ -89,6 +89,7 @@ Starts in default (PRIMARY) mode, monitoring mouse selections.
 - `-p, --primary`        Monitor PRIMARY selection only (mouse selection, default)
 - `-c, --clipboard`      Monitor CLIPBOARD selection only (Ctrl+C)
 - `-b, --both`           Monitor both PRIMARY and CLIPBOARD
+- `--log-dir DIR`        Set output directory for log files (also via SELECTION_LOG_DIR env var)
 - `-v, --version`        Show version information
 - `-h, --help`           Show this help message
 

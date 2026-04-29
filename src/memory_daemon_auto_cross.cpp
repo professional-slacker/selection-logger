@@ -47,27 +47,40 @@ bool create_directory(const std::string& path) {
 #endif
 }
 
-// Get log file path based on current Year/Month
-std::string get_log_file_path() {
-    std::string base_dir;
+// Global log directory override (set via --log-dir or SELECTION_LOG_DIR)
+std::string g_log_dir;
 
+// Resolve the log directory: --log-dir arg > SELECTION_LOG_DIR env > default
+std::string resolve_log_dir() {
+    if (!g_log_dir.empty()) {
+        return g_log_dir;
+    }
+    const char* env = std::getenv("SELECTION_LOG_DIR");
+    if (env && env[0] != '\0') {
+        return std::string(env);
+    }
 #ifdef _WIN32
     // Windows: use Documents folder with SHGetFolderPathW (more compatible with MinGW)
     wchar_t documents[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, documents))) {
         char documents_utf8[MAX_PATH];
         WideCharToMultiByte(CP_UTF8, 0, documents, -1, documents_utf8, MAX_PATH, NULL, NULL);
-        base_dir = std::string(documents_utf8) + "\\SelectionLogs";
+        return std::string(documents_utf8) + "\\SelectionLogs";
     } else {
         // Fallback to current directory
-        base_dir = "SelectionLogs";
+        return "SelectionLogs";
     }
 #else
     // Linux: use home directory
     const char* home = getenv("HOME");
     if (!home) home = ".";
-    base_dir = std::string(home) + "/memories";
+    return std::string(home) + "/memories";
 #endif
+}
+
+// Get log file path based on current Year/Month
+std::string get_log_file_path() {
+    std::string base_dir = resolve_log_dir();
 
     // Create directory
     create_directory(base_dir);
@@ -156,6 +169,10 @@ int main(int argc, char* argv[]) {
             mode = "primary";
         } else if (arg == "--both" || arg == "-b") {
             mode = "both";
+        } else if (arg == "--log-dir") {
+            if (i + 1 < argc) {
+                g_log_dir = argv[++i];
+            }
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Selection Logger v1.0" << std::endl;
             std::cout << "Usage:" << std::endl;
@@ -164,6 +181,7 @@ int main(int argc, char* argv[]) {
             std::cout << "  --primary, -p    Monitor primary selection (default)" << std::endl;
             std::cout << "  --clipboard, -c  Monitor clipboard selection" << std::endl;
             std::cout << "  --both, -b       Monitor both selections" << std::endl;
+            std::cout << "  --log-dir DIR    Set output directory for log files" << std::endl;
             std::cout << "  --version, -v    Show version information" << std::endl;
             std::cout << "  --help, -h       Show this help" << std::endl;
             return 0;
