@@ -93,8 +93,27 @@ else
 	@touch $@  # Create empty object file for Linux builds
 endif
 
+# Test build rules
+TEST_SRCS = test/test_selection.cpp test/test_clipboard_formats.cpp test/test_file_copy.cpp test/test_platform.cpp
+TEST_BINS = test/test_selection test/test_clipboard_formats test/test_file_copy test/test_platform
+COMMON_OBJS = $(addprefix $(SRC_DIR)/, clipboard.o platform.o win32_compat.o)
+
+test_bins: $(TEST_BINS)
+
+test/test_selection: test/test_selection.cpp $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(COMMON_OBJS) $(LDFLAGS)
+
+test/test_clipboard_formats: test/test_clipboard_formats.cpp $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(COMMON_OBJS) $(LDFLAGS)
+
+test/test_file_copy: test/test_file_copy.cpp $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(COMMON_OBJS) $(LDFLAGS)
+
+test/test_platform: test/test_platform.cpp $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(COMMON_OBJS) $(LDFLAGS)
+
 # Test targets
-test: all
+test: all test_bins
 ifeq ($(PLATFORM),linux)
 	@echo "Running Linux tests..."
 	cd test && ./test_selection || true
