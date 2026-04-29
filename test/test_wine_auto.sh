@@ -33,7 +33,11 @@ echo "1. Testing --help option:"
 wine selection-logger.exe --help
 
 echo ""
-echo "2. Testing different modes:"
+echo "2. Testing --version option:"
+wine selection-logger.exe --version 2>&1 || true
+
+echo ""
+echo "3. Testing different modes:"
 echo "   a) --primary mode (mouse selection):"
 timeout 3 wine selection-logger.exe --primary --interval 1000 2>&1 || true
 

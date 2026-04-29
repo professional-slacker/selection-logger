@@ -157,14 +157,26 @@ int main(int argc, char* argv[]) {
         } else if (arg == "--both" || arg == "-b") {
             mode = "both";
         } else if (arg == "--help" || arg == "-h") {
-            std::cout << "Selection Logger" << std::endl;
+            std::cout << "Selection Logger v1.0" << std::endl;
             std::cout << "Usage:" << std::endl;
             std::cout << "  selection-logger [options]" << std::endl;
             std::cout << "Options:" << std::endl;
             std::cout << "  --primary, -p    Monitor primary selection (default)" << std::endl;
             std::cout << "  --clipboard, -c  Monitor clipboard selection" << std::endl;
             std::cout << "  --both, -b       Monitor both selections" << std::endl;
+            std::cout << "  --version, -v    Show version information" << std::endl;
             std::cout << "  --help, -h       Show this help" << std::endl;
+            return 0;
+        } else if (arg == "--version" || arg == "-v") {
+            std::cout << "Selection Logger v1.0" << std::endl;
+            std::cout << "Cross-platform clipboard monitoring daemon" << std::endl;
+            std::cout << "Build: " << __DATE__ << " " << __TIME__ << std::endl;
+#ifdef PLATFORM_LINUX
+            std::cout << "Platform: Linux (X11)" << std::endl;
+#endif
+#ifdef _WIN32
+            std::cout << "Platform: Windows (Win32)" << std::endl;
+#endif
             return 0;
         }
     }
