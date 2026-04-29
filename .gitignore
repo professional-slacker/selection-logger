@@ -45,6 +45,10 @@
 /selection-logger-auto
 
 # Test log artifacts (binaries tracked)
+test/test_selection
+test/test_clipboard_formats
+test/test_file_copy
+test/test_platform
 stdout.txt
 stderr.txt
 test_file.txt

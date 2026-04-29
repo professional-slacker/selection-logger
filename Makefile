@@ -66,7 +66,7 @@ endif
 
 # Clean target
 clean:
-	rm -f $(SRC_DIR)/*.o $(TARGET) test_*
+	rm -f $(SRC_DIR)/*.o $(TARGET) test/test_selection test/test_clipboard_formats test/test_file_copy test/test_platform
 
 # Link
 $(TARGET): $(OBJS) $(WIN32_OBJS)
@@ -97,9 +97,9 @@ endif
 test: all
 ifeq ($(PLATFORM),linux)
 	@echo "Running Linux tests..."
-	./test_selection || true
-	./test_clipboard_formats || true
-	./test_platform || true
+	cd test && ./test_selection || true
+	cd test && ./test_clipboard_formats || true
+	cd test && ./test_platform || true
 else
 	@echo "Windows build - use 'make test-wine' for Wine testing"
 endif
