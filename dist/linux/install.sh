@@ -19,10 +19,10 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Install binaries
-echo "Installing binaries to ${BIN_DIR}..."
-cp selection-logger selection-logger-auto "${BIN_DIR}/"
-chmod 755 "${BIN_DIR}/selection-logger" "${BIN_DIR}/selection-logger-auto"
+# Install binary
+echo "Installing binary to ${BIN_DIR}..."
+cp selection-logger "${BIN_DIR}/"
+chmod 755 "${BIN_DIR}/selection-logger"
 
 echo "Binaries installed successfully."
 
@@ -37,7 +37,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/selection-logger-auto
+ExecStart=/usr/local/bin/selection-logger
 Restart=on-failure
 RestartSec=5
 

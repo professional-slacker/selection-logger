@@ -6,7 +6,6 @@
 selection-logger/
 ├── Makefile                    # Cross-platform build system
 ├── README.md                   # Main documentation
-├── QUICK_START.md              # Quick start guide
 ├── DEVELOPMENT.md              # This file
 ├── create_release.sh           # Release packaging script
 ├── test_wine_auto.sh           # Wine testing script
@@ -24,10 +23,10 @@ selection-logger/
 │   └── main_win32.cpp         # Windows main entry point
 │
 ├── dist/                       # Distribution files
-│   ├── windows/               # Windows distribution
-│   └── windows_complete/      # Complete Windows package
+│   ├── linux/                 # Linux distribution
+│   └── windows/               # Windows distribution
 │
-└── install_*.sh/ps1/bat       # Installation scripts
+└── install_*.sh               # Installation scripts
 ```
 
 ## Build System

@@ -33,30 +33,28 @@ else
 endif
 
 # Targets
-TARGETS = selection-logger$(EXE_EXT) selection-logger-auto$(EXE_EXT)
+TARGET = selection-logger$(EXE_EXT)
 
 # Source files
 COMMON_SRCS = clipboard.cpp platform.cpp win32_compat.cpp
-
-# Platform-specific main sources
 ifeq ($(PLATFORM),windows)
-    MAIN_SRCS = memory_daemon_cross.cpp $(COMMON_SRCS)
-    AUTO_SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
+    SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
 else
-    MAIN_SRCS = memory_daemon_cross.cpp $(COMMON_SRCS)
-    AUTO_SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
+    SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
 endif
 
 # Object files
-MAIN_OBJS = $(MAIN_SRCS:.cpp=.o)
-AUTO_OBJS = $(AUTO_SRCS:.cpp=.o)
+OBJS = $(SRCS:.cpp=.o)
 
-# Windows-specific sources
-WIN32_SRCS = service_win32.cpp main_win32.cpp
-WIN32_OBJS = $(WIN32_SRCS:.cpp=.o)
+# Windows-specific objects
+ifeq ($(PLATFORM),windows)
+    WIN32_OBJS = service_win32.o main_win32.o
+else
+    WIN32_OBJS =
+endif
 
 # Default target
-all: $(TARGETS)
+all: $(TARGET)
 
 # Release target (statically linked for Windows)
 release: clean
@@ -68,38 +66,20 @@ endif
 
 # Clean target
 clean:
-	rm -f *.o $(TARGETS) test_*
+	rm -f *.o $(TARGET) test_*
 
-# Windows-specific objects (always needed for Windows builds)
-ifeq ($(PLATFORM),windows)
-    WIN32_OBJS = service_win32.o main_win32.o
-else
-    WIN32_OBJS =
-endif
-
-# Main executable (DEPRECATED: manual mode)
-selection-logger$(EXE_EXT): $(MAIN_OBJS) $(WIN32_OBJS)
-	$(CXX) -o $@ $(MAIN_OBJS) $(WIN32_OBJS) $(LDFLAGS)
-	@echo "WARNING: selection-logger (manual mode) is DEPRECATED"
-	@echo "Use selection-logger-auto for automatic monitoring"
-
-# Auto-monitoring executable (RECOMMENDED)
-selection-logger-auto$(EXE_EXT): $(AUTO_OBJS) $(WIN32_OBJS)
-	$(CXX) -o $@ $(AUTO_OBJS) $(WIN32_OBJS) $(LDFLAGS)
+# Auto-monitoring executable
+$(TARGET): $(OBJS) $(WIN32_OBJS)
+	$(CXX) -o $@ $(OBJS) $(WIN32_OBJS) $(LDFLAGS)
 
 # Compile rules
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Windows-specific sources compilation
+# Windows-specific sources compilation (stubs on non-Windows)
 service_win32.o: service_win32.cpp service_win32.h
+ifeq ($(PLATFORM),windows)
 	$(CXX) $(CXXFLAGS) -c service_win32.cpp -o service_win32.o
-
-main_win32.o: main_win32.cpp
-	$(CXX) $(CXXFLAGS) -c main_win32.cpp -o main_win32.otion
-service_win32.o: service_win32.cpp
-ifeq ($(PLATFORM),windows)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
 else
 	@echo "Skipping Windows-only file: $<"
 	@touch $@  # Create empty object file for Linux builds
@@ -112,10 +92,6 @@ else
 	@echo "Skipping Windows-only file: $<"
 	@touch $@  # Create empty object file for Linux builds
 endif
-
-# Clean
-clean:
-	rm -f *.o $(TARGETS) selection-logger.exe selection-logger-auto.exe
 
 # Test targets
 test: all
@@ -129,10 +105,10 @@ else
 endif
 
 # Wine testing
-test-wine: selection-logger.exe
+test-wine: $(TARGET)
 	@echo "Testing with Wine..."
 	@echo "Note: Wine clipboard access may require X11 integration"
-	wine selection-logger.exe --help || true
+	wine $(TARGET) --help || true
 
 # Build for Windows (cross-compile)
 windows: clean
@@ -143,16 +119,14 @@ linux: clean
 	$(MAKE) PLATFORM=linux
 
 # Install (Linux only)
-install: selection-logger
+install: $(TARGET)
 	@echo "Installing to /usr/local/bin..."
-	sudo cp selection-logger /usr/local/bin/
-	sudo cp selection-logger-auto /usr/local/bin/
+	sudo cp $(TARGET) /usr/local/bin/
 
 # Uninstall (Linux only)
 uninstall:
 	@echo "Removing from /usr/local/bin..."
-	sudo rm -f /usr/local/bin/selection-logger
-	sudo rm -f /usr/local/bin/selection-logger-auto
+	sudo rm -f /usr/local/bin/$(TARGET)
 
 # Help
 help:

@@ -8,9 +8,9 @@ A lightweight daemon that monitors X11 text selections (clipboard and primary se
 # Install dependencies (Debian/Ubuntu)
 sudo apt install libx11-dev xclip
 
-# Run manually (foreground, for testing)
-chmod +x selection-logger-auto
-./selection-logger-auto
+# Run in foreground (for testing)
+chmod +x selection-logger
+./selection-logger
 
 # Or install as a systemd user service
 sudo ./install.sh
@@ -20,18 +20,15 @@ sudo ./install.sh
 
 | File | Description |
 |---|---|
-| `selection-logger` | Manual mode (DEPRECATED) |
-| `selection-logger-auto` | Automatic monitoring mode (recommended) |
+| `selection-logger` | Clipboard monitoring daemon |
 | `install.sh` | Systemd service installer |
 | `LICENSE` | License information |
 
 ## Usage
 
-### Automatic Monitoring (Recommended)
-
 ```bash
 # Run in foreground (for testing)
-./selection-logger-auto
+./selection-logger
 
 # Install as systemd service
 sudo ./install.sh
@@ -42,14 +39,6 @@ systemctl --user status selection-logger
 # View logs
 journalctl --user -u selection-logger -f
 ```
-
-### Manual Mode (Legacy)
-
-```bash
-./selection-logger
-```
-
-Reads the current selection once and logs it, then waits for Enter key press to read again.
 
 ## Log Files
 
@@ -81,9 +70,8 @@ systemctl --user stop selection-logger
 systemctl --user disable selection-logger
 rm ~/.config/systemd/user/selection-logger.service
 
-# Remove binaries
+# Remove binary
 sudo rm /usr/local/bin/selection-logger
-sudo rm /usr/local/bin/selection-logger-auto
 ```
 
 ## Security Notes

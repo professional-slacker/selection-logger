@@ -3,6 +3,8 @@
 
 A lightweight cross-platform daemon that monitors system text selections and automatically logs changes to dated files.
 
+> **[Download the latest binary](https://github.com/yourusername/selection-logger/releases)** — no build tools required.
+
 ## ✨ Features
 - **Cross-platform**: Windows and Linux (Wine test compatible)
 - **Automatic Capture Only**: Saves text selections automatically when they change
@@ -34,7 +36,12 @@ make PLATFORM=windows STATIC=1
 ### macOS
 Not yet supported.
 
-## 🛠 Installation & Build
+## 📦 Download
+
+Pre-built binaries are available from the [Releases page](https://github.com/yourusername/selection-logger/releases).
+No build tools required — just download and run.
+
+## 🛠 Build from Source
 
 ### Cross-platform Build System
 This project uses a Makefile for cross-platform compilation supporting Linux, Windows, and Wine testing.

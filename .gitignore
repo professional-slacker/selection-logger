@@ -40,6 +40,15 @@
 # debug information files
 *.dwo
 
+# Linux binaries (build artifacts, root only)
+/selection-logger
+/selection-logger-auto
+
+# Test log artifacts (binaries tracked)
+stdout.txt
+stderr.txt
+test_file.txt
+
 # Internal documents
 *レポート*.md
 *報告書*.md
