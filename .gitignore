@@ -43,6 +43,8 @@
 # Linux binaries (build artifacts, root only)
 /selection-logger
 /selection-logger-auto
+/selection-logger-original
+/selection-logger-unified
 
 # Test log artifacts (binaries tracked)
 test/test_selection
