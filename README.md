@@ -1,21 +1,21 @@
-```markdown
 # selection-logger
 
 A lightweight cross-platform daemon that monitors system text selections and automatically logs changes to dated files.
 
-> **[Download the latest binary](https://github.com/yourusername/selection-logger/releases)** — no build tools required.
+> **Windows**: [Download from Releases](https://github.com/professional-slacker/selection-logger/releases) — no build tools required.
+> **Linux**: Build from source (see below) or `create_release.sh` to package.
 
-## ✨ Features
+## Features
 - **Cross-platform**: Windows and Linux (Wine test compatible)
 - **Automatic Capture Only**: Saves text selections automatically when they change
 - **Dual Selection Monitoring**: Monitors both PRIMARY (mouse selection) and CLIPBOARD (Ctrl+C) selections
-- **Smart Organization**: Automatically categorizes logs into `~/memories/Year/Month.txt`
+- **Smart Organization**: Automatically categorizes logs into `~/memories/YYYY-MM.txt` (Linux) or `Documents\SelectionLogs\YYYY-MM.txt` (Windows)
 - **Low Overhead**: A minimal background process designed for cross-platform environments
 - **Timestamped**: Every entry is recorded with a precise timestamp for later reference
 - **Configurable**: Multiple monitoring modes and adjustable polling interval
 - **Static Linking**: No external DLL dependencies (Windows)
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Linux/X11
 You need the X11 development libraries and `xclip` installed on your system.
@@ -36,19 +36,30 @@ make PLATFORM=windows STATIC=1
 ### macOS
 Not yet supported.
 
-## 📦 Download
+## Download
 
-Pre-built binaries are available from the [Releases page](https://github.com/yourusername/selection-logger/releases).
-No build tools required — just download and run.
+### Windows
+Pre-built binaries are available from the [Releases page](https://github.com/professional-slacker/selection-logger/releases).
+Download `selection-logger-windows-x86_64.zip` and extract to any directory.
 
-## 🛠 Build from Source
+### Linux
+Pre-built binaries are available from the [Releases page](https://github.com/professional-slacker/selection-logger/releases).
+Download `selection-logger-linux-1.0.0.tar.gz` and extract:
+```bash
+tar -xzf selection-logger-linux-1.0.0.tar.gz
+cd linux/
+sudo cp selection-logger /usr/local/bin/
+```
+Or build from source (X11 libraries required): `make PLATFORM=linux`
+
+## Build from Source
 
 ### Cross-platform Build System
 This project uses a Makefile for cross-platform compilation supporting Linux, Windows, and Wine testing.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/selection-logger.git
+git clone https://github.com/professional-slacker/selection-logger.git
 cd selection-logger
 
 # Build for Linux (X11)
@@ -61,70 +72,75 @@ make clean && make PLATFORM=windows STATIC=1
 make clean && make release PLATFORM=windows
 ```
 
-## 🚀 Usage
+## Usage
 
 ### Basic Usage
 ```bash
-./selection-logger-auto
+./selection-logger
 ```
-Starts in hybrid mode (monitors both PRIMARY and CLIPBOARD selections).
+Starts in default (PRIMARY) mode, monitoring mouse selections.
 
 ### Command Line Options
 ```bash
-./selection-logger-auto [options]
+./selection-logger [options]
 ```
 
 **Options:**
-- `-p, --primary`        Monitor PRIMARY selection only (mouse selection)
+- `-p, --primary`        Monitor PRIMARY selection only (mouse selection, default)
 - `-c, --clipboard`      Monitor CLIPBOARD selection only (Ctrl+C)
-- `-b, --both`           Monitor both PRIMARY and CLIPBOARD (default)
-- `-i N, --interval N`   Polling interval in milliseconds (default: 1000)
+- `-b, --both`           Monitor both PRIMARY and CLIPBOARD
+- `-v, --version`        Show version information
 - `-h, --help`           Show this help message
 
 **Modes:**
-- **PRIMARY**: Saves text when selected with mouse (no Ctrl+C needed)
+- **PRIMARY**: Saves text when selected with mouse (no Ctrl+C needed, default)
 - **CLIPBOARD**: Saves text when copied with Ctrl+C (works with Ctrl+A → Ctrl+C workflow)
 - **BOTH**: Monitors both selections (recommended for comprehensive logging)
 
 ### Examples
 ```bash
-# Monitor mouse selections only
-./selection-logger-auto --primary
+# Monitor mouse selections only (default)
+./selection-logger
 
-# Monitor Ctrl+C copies only (useful for Ctrl+A → Ctrl+C workflow)
-./selection-logger-auto --clipboard
+# Monitor Ctrl+C copies only
+./selection-logger --clipboard
 
-# Monitor both with faster polling (500ms)
-./selection-logger-auto --both --interval 500
+# Monitor both selections
+./selection-logger --both
 
 # Run in background
-./selection-logger-auto --both &
+./selection-logger --both &
 ```
 
-## 📂 Directory Structure
+## Directory Structure
+### Linux
 ```text
-/home/USER/memories/
-└── 2026/
-    ├── 03.txt  <-- Log entries are appended here
-    └── 04.txt
+~/memories/
+    2026-04.txt  <-- Log entries are appended here
 ```
 
-## 📝 Log Format
+### Windows
+```text
+%USERPROFILE%\Documents\SelectionLogs\
+    2026-04.txt  <-- Log entries are appended here
+```
+
+## Log Format
 Entries are saved in the following format:
 ```text
---- Mon Mar 30 12:59:50 2026 ---
+--- PRIMARY 2026-04-28 14:30:00 ---
 Your captured text selection appears here.
 
---- Mon Mar 30 13:05:22 2026 ---
-file:///home/user/documents/report.pdf
-
---- Mon Mar 30 13:10:15 2026 ---
+--- CLIPBOARD 2026-04-28 14:35:22 ---
 Another important text snippet.
+
+--- PRIMARY 2026-04-28 14:40:15 ---
+file:///home/user/documents/report.pdf
 ```
 
 **Note:** File copies (Ctrl+C on files) are also logged as file URIs.
 
-## 🔧 Technical Details
+## Technical Details
 
 ### Cross-platform Architecture
 - **Linux/X11**: Uses xclip command-line tool for clipboard access
@@ -134,7 +150,7 @@ Another important text snippet.
 
 ### How It Works
 1. Uses platform-specific tools to access system selections
-2. Polls selections at configurable intervals (default: 1 second)
+2. Polls selections at configurable intervals (default: 500ms)
 3. Detects changes by comparing with previous selection content
 4. Skips empty or whitespace-only selections
 5. Creates log directories automatically if they don't exist
@@ -142,47 +158,62 @@ Another important text snippet.
 ### Selection Types
 - **PRIMARY Selection**: Updated when text is selected with mouse (middle-click paste on X11)
 - **CLIPBOARD Selection**: Updated with Ctrl+C (standard copy/paste)
-- **Note**: Some applications may not update PRIMARY selection with Ctrl+A
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Startup Automation**: Add to your `.xinitrc` or desktop environment's "Startup Applications":
    ```bash
-   /path/to/selection-logger-auto --both &
+   /path/to/selection-logger --both &
    ```
 
 2. **Recommended Mode**: Use `--both` mode for comprehensive logging of all text selections.
 
-3. **Performance**: Default 1000ms interval provides good balance between responsiveness and CPU usage.
+3. **Performance**: Default 500ms interval provides good balance between responsiveness and CPU usage.
 
 4. **File Operations**: File copies are logged as file URIs (e.g., `file:///path/to/file.txt`).
 
-## 🌐 Platform Support
+## Platform Support
 
 ### Linux (X11)
 - **Dependencies**: `libx11-dev`, `xclip`
 - **Install**: `sudo apt-get install libx11-dev xclip` (Ubuntu/Debian)
 - **Build**: `make PLATFORM=linux`
-- **Run**: `./selection-logger-auto [options]`
+- **Run**: `./selection-logger [options]`
+- **Dist Package**: `dist/linux/` — includes install script and systemd user service
 
 ### Windows
 - **Build**: `make PLATFORM=windows STATIC=1`
-- **Output**: `selection-logger-auto.exe` (statically linked)
-- **Run**: `selection-logger-auto.exe [options]`
+- **Output**: `selection-logger.exe` (statically linked)
+- **Run**: `selection-logger.exe [options]`
 - **Features**: No external DLL dependencies, Win32 API
+- **Dist Package**: `dist/windows/` — includes install/uninstall scripts
 
 ### Wine Testing Environment
 - **Purpose**: Test Windows builds on Linux during development
-- **Test Script**: `./test_wine_auto.sh`
+- **Test Script**: `test/test_wine.sh`, `test/test_wine_auto.sh`
 - **Requirements**: Wine installed (`sudo apt-get install wine`)
 - **Benefits**: Cross-platform compatibility verification
 
 ### Development Workflow
-1. **Code**: Write cross-platform C++ code
-2. **Build**: `make PLATFORM=windows STATIC=1`
-3. **Test**: `./test_wine_auto.sh` (Wine testing)
-4. **Deploy**: Package for Windows and Linux
+1. **Code**: Write cross-platform C++ code in `src/`
+2. **Build**: `make PLATFORM=linux` or `make PLATFORM=windows STATIC=1`
+3. **Test**: `cd test && ./test_wine_auto.sh` (Wine testing)
+4. **Test**: `make test` (Linux native tests)
+5. **Package**: `./create_release.sh` (creates distribution archives)
+6. **Deploy**: Upload to GitHub Releases
+
+## Project Structure
+```text
+selection-logger/
+├── src/               # Source code
+├── test/              # Test scripts and binaries
+├── dist/
+│   ├── linux/         # Linux distribution package
+│   └── windows/       # Windows distribution package
+├── Makefile           # Build system
+├── create_release.sh  # Release archive generator
+└── README.md          # This file
+```
 
 ## License
 MIT License
-```
