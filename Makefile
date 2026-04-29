@@ -1,9 +1,12 @@
 # Selection Logger Makefile
 # Cross-platform build system for Windows (Wine testing) and Linux
 
+# Directories
+SRC_DIR = src
+
 # Compiler settings
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -O2
+CXXFLAGS = -std=c++11 -Wall -Wextra -O2 -I$(SRC_DIR)
 LDFLAGS =
 
 # Platform settings (can be overridden)
@@ -35,20 +38,17 @@ endif
 # Targets
 TARGET = selection-logger$(EXE_EXT)
 
-# Source files
+# Source files (relative to SRC_DIR)
 COMMON_SRCS = clipboard.cpp platform.cpp win32_compat.cpp
-ifeq ($(PLATFORM),windows)
-    SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
-else
-    SRCS = memory_daemon_auto_cross.cpp $(COMMON_SRCS)
-endif
+MAIN_SRC = memory_daemon_auto_cross.cpp
 
-# Object files
-OBJS = $(SRCS:.cpp=.o)
+# All sources with paths
+SRCS = $(MAIN_SRC) $(COMMON_SRCS)
+OBJS = $(addprefix $(SRC_DIR)/, $(SRCS:.cpp=.o))
 
 # Windows-specific objects
 ifeq ($(PLATFORM),windows)
-    WIN32_OBJS = service_win32.o main_win32.o
+    WIN32_OBJS = $(SRC_DIR)/service_win32.o $(SRC_DIR)/main_win32.o
 else
     WIN32_OBJS =
 endif
@@ -66,26 +66,26 @@ endif
 
 # Clean target
 clean:
-	rm -f *.o $(TARGET) test_*
+	rm -f $(SRC_DIR)/*.o $(TARGET) test_*
 
-# Auto-monitoring executable
+# Link
 $(TARGET): $(OBJS) $(WIN32_OBJS)
 	$(CXX) -o $@ $(OBJS) $(WIN32_OBJS) $(LDFLAGS)
 
 # Compile rules
-%.o: %.cpp
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Windows-specific sources compilation (stubs on non-Windows)
-service_win32.o: service_win32.cpp service_win32.h
+$(SRC_DIR)/service_win32.o: $(SRC_DIR)/service_win32.cpp $(SRC_DIR)/service_win32.h
 ifeq ($(PLATFORM),windows)
-	$(CXX) $(CXXFLAGS) -c service_win32.cpp -o service_win32.o
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 else
 	@echo "Skipping Windows-only file: $<"
 	@touch $@  # Create empty object file for Linux builds
 endif
 
-main_win32.o: main_win32.cpp
+$(SRC_DIR)/main_win32.o: $(SRC_DIR)/main_win32.cpp
 ifeq ($(PLATFORM),windows)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 else

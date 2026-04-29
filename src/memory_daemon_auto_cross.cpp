@@ -157,9 +157,9 @@ int main(int argc, char* argv[]) {
         } else if (arg == "--both" || arg == "-b") {
             mode = "both";
         } else if (arg == "--help" || arg == "-h") {
-            std::cout << "Selection Logger Auto-Monitoring" << std::endl;
+            std::cout << "Selection Logger" << std::endl;
             std::cout << "Usage:" << std::endl;
-            std::cout << "  selection-logger-auto [options]" << std::endl;
+            std::cout << "  selection-logger [options]" << std::endl;
             std::cout << "Options:" << std::endl;
             std::cout << "  --primary, -p    Monitor primary selection (default)" << std::endl;
             std::cout << "  --clipboard, -c  Monitor clipboard selection" << std::endl;

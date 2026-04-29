@@ -11,11 +11,9 @@ selection-logger/
 ├── test_wine_auto.sh           # Wine testing script
 ├── test_wine.sh               # Legacy Wine test script
 │
-├── *.cpp, *.h                  # Source files
-│   ├── memory_daemon.cpp      # DEPRECATED: Manual mode (Linux)
-│   ├── memory_daemon_auto.cpp # Auto mode (Linux)
-│   ├── memory_daemon_cross.cpp # Cross-platform auto mode
-│   ├── memory_daemon_auto_cross.cpp # Cross-platform auto mode
+├── src/                       # Source files
+│   ├── memory_daemon_auto_cross.cpp # Cross-platform auto monitoring
+│   ├── memory_daemon_cross.cpp # DEPRECATED: Manual mode
 │   ├── clipboard.cpp/h        # Platform-specific clipboard
 │   ├── platform.cpp/h         # Platform detection
 │   ├── win32_compat.cpp/h     # Win32 compatibility layer
