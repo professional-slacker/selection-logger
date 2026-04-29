@@ -3,7 +3,7 @@
 A lightweight cross-platform daemon that monitors system text selections and automatically logs changes to dated files.
 
 > **Windows**: [Download from Releases](https://github.com/professional-slacker/selection-logger/releases) — no build tools required.
-> **Linux**: Build from source (see below) or `create_release.sh` to package.
+> **Linux**: [Download from Releases](https://github.com/professional-slacker/selection-logger/releases) — pre-built binary available.
 
 ## Features
 - **Cross-platform**: Windows and Linux (Wine test compatible)
