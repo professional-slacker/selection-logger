@@ -25,84 +25,18 @@ make clean
 make PLATFORM=linux
 
 echo "Copying Windows release files..."
-cp selection-logger.exe selection-logger-auto.exe "${WINDOWS_DIR}/"
-cp LICENSE.txt "${WINDOWS_DIR}/"
-cp README.md "${WINDOWS_DIR}/"
-
-# Create Windows README
-cat > "${WINDOWS_DIR}/README_WINDOWS.txt" << 'EOF'
-Selection Logger for Windows
-============================
-
-Version: ${VERSION}
-
-Files included:
-- selection-logger.exe      - Main selection logger
-- selection-logger-auto.exe - Automatic monitoring version
-- LICENSE.txt              - License information
-- README.md                - General documentation
-
-Usage:
-1. Run selection-logger.exe to log clipboard/selection manually
-2. Run selection-logger-auto.exe for automatic monitoring
-
-Features:
-- Cross-platform clipboard logging
-- Automatic monitoring option
-- Monthly log file organization
-
-Requirements:
-- Windows 7 or later
-- No additional DLLs required (statically linked)
-
-Notes:
-- Logs are saved to: %USERPROFILE%/selection_logs/
-- Each month creates a new log file (YYYY/MM.txt)
-EOF
+cp selection-logger.exe "${WINDOWS_DIR}/"
+cp dist/windows/LICENSE "${WINDOWS_DIR}/"
+cp dist/windows/README.md "${WINDOWS_DIR}/"
+cp dist/windows/install.bat "${WINDOWS_DIR}/"
+cp dist/windows/install.ps1 "${WINDOWS_DIR}/"
+cp dist/windows/uninstall.bat "${WINDOWS_DIR}/"
 
 echo "Copying Linux release files..."
-cp selection-logger selection-logger-auto "${LINUX_DIR}/"
-cp LICENSE.txt "${LINUX_DIR}/"
-cp README.md "${LINUX_DIR}/"
-
-# Create Linux README
-cat > "${LINUX_DIR}/README_LINUX.txt" << 'EOF'
-Selection Logger for Linux
-==========================
-
-Version: ${VERSION}
-
-Files included:
-- selection-logger      - Main selection logger
-- selection-logger-auto - Automatic monitoring version
-- LICENSE.txt          - License information
-- README.md            - General documentation
-
-Dependencies:
-- X11 development libraries
-- xclip command-line tool
-- pthread library
-
-Install dependencies on Ubuntu/Debian:
-  sudo apt-get install libx11-dev xclip
-
-Install dependencies on Fedora/RHEL:
-  sudo dnf install libX11-devel xclip
-
-Usage:
-1. Run ./selection-logger to log clipboard/selection manually
-2. Run ./selection-logger-auto for automatic monitoring
-
-Features:
-- Cross-platform clipboard logging
-- Automatic monitoring option
-- Monthly log file organization
-
-Notes:
-- Logs are saved to: ~/selection_logs/
-- Each month creates a new log file (YYYY/MM.txt)
-- Requires X11 session for clipboard access
-EOF
+cp selection-logger "${LINUX_DIR}/"
+cp dist/linux/LICENSE "${LINUX_DIR}/"
+cp dist/linux/README.md "${LINUX_DIR}/"
+cp dist/linux/install.sh "${LINUX_DIR}/"
 
 echo "Creating archives..."
 cd "${RELEASE_DIR}"
