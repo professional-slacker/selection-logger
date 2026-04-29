@@ -42,7 +42,6 @@
 
 # Linux binaries (build artifacts, root only)
 /selection-logger
-/selection-logger-auto
 /selection-logger-original
 /selection-logger-unified
 
