@@ -31,7 +31,7 @@ ifeq ($(PLATFORM),windows)
 else
     # Default to Linux
     PLATFORM = linux
-    CXXFLAGS += -DPLATFORM_LINUX=1
+    CXXFLAGS +=
     LDFLAGS += -lX11 -lpthread
 endif
 
@@ -140,7 +140,8 @@ linux: clean
 # Install (Linux only)
 install: $(TARGET)
 	@echo "Installing to /usr/local/bin..."
-	sudo cp $(TARGET) /usr/local/bin/
+	cp $(TARGET) /usr/local/bin/
+	@echo "Done."
 
 # Uninstall (Linux only)
 uninstall:

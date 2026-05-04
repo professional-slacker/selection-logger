@@ -1,7 +1,7 @@
 #ifndef SERVICE_WIN32_H
 #define SERVICE_WIN32_H
 
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
 
 #include <windows.h>
 #include <string>
@@ -41,6 +41,6 @@ int ConsoleMain(int argc, char* argv[]);
 std::wstring GetLogFilePath();
 std::string GetClipboardTextWin32();
 
-#endif // _WIN32
+#endif // PLATFORM_WINDOWS
 
 #endif // SERVICE_WIN32_H

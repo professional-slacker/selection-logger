@@ -12,12 +12,14 @@
 #include <cstring>
 #include <atomic>
 
+#include "platform.h"
+
 // Platform-specific includes
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     #include <windows.h>
     #include <shlobj.h>
     #include "service_win32.h"
-#else
+#elif PLATFORM_LINUX
     #include <X11/Xlib.h>
     #include <X11/Xatom.h>
     #include <unistd.h>
@@ -25,7 +27,6 @@
     #include <sys/types.h>
 #endif
 
-#include "platform.h"
 #include "clipboard.h"
 
 // Global flag for graceful shutdown
@@ -40,10 +41,12 @@ void signal_handler(int signal) {
 
 // Create directory if it doesn't exist
 bool create_directory(const std::string& path) {
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     return CreateDirectoryA(path.c_str(), NULL) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
-#else
+#elif PLATFORM_LINUX
     return mkdir(path.c_str(), 0755) == 0 || errno == EEXIST;
+#else
+    return false;
 #endif
 }
 
@@ -59,7 +62,7 @@ std::string resolve_log_dir() {
     if (env && env[0] != '\0') {
         return std::string(env);
     }
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     // Windows: use Documents folder with SHGetFolderPathW (more compatible with MinGW)
     wchar_t documents[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, documents))) {
@@ -70,11 +73,13 @@ std::string resolve_log_dir() {
         // Fallback to current directory
         return "SelectionLogs";
     }
-#else
+#elif PLATFORM_LINUX
     // Linux: use home directory
     const char* home = getenv("HOME");
     if (!home) home = ".";
     return std::string(home) + "/memories";
+#else
+    return ".";
 #endif
 }
 
@@ -90,8 +95,11 @@ std::string get_log_file_path() {
     auto time = std::chrono::system_clock::to_time_t(now);
 
     std::tm tm;
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     localtime_s(&tm, &time);
+#elif PLATFORM_LINUX
+    std::tm* tmp = std::localtime(&time);
+    tm = *tmp;
 #else
     std::tm* tmp = std::localtime(&time);
     tm = *tmp;
@@ -100,7 +108,7 @@ std::string get_log_file_path() {
     // Build file path
     std::stringstream ss;
     ss << base_dir;
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     ss << "\\";
 #else
     ss << "/";
@@ -112,7 +120,7 @@ std::string get_log_file_path() {
 }
 
 // Platform-specific initialization
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
 // Windows: Set up console control handler
 BOOL WINAPI console_handler(DWORD signal) {
     if (signal == CTRL_C_EVENT) {
@@ -129,7 +137,7 @@ bool init_platform() {
 void cleanup_platform() {
     // Nothing special for Windows
 }
-#else
+#elif PLATFORM_LINUX
 // Linux: Set up X11 display
 Display* g_display = nullptr;
 
@@ -189,10 +197,9 @@ int main(int argc, char* argv[]) {
             std::cout << "Selection Logger v1.0" << std::endl;
             std::cout << "Cross-platform clipboard monitoring daemon" << std::endl;
             std::cout << "Build: " << __DATE__ << " " << __TIME__ << std::endl;
-#ifdef PLATFORM_LINUX
+#if PLATFORM_LINUX
             std::cout << "Platform: Linux (X11)" << std::endl;
-#endif
-#ifdef _WIN32
+#elif PLATFORM_WINDOWS
             std::cout << "Platform: Windows (Win32)" << std::endl;
 #endif
             return 0;
@@ -237,7 +244,7 @@ int main(int argc, char* argv[]) {
                 if (ofs) {
                     auto now = std::chrono::system_clock::now();
                     auto time = std::chrono::system_clock::to_time_t(now);
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
                     std::tm tm;
                     localtime_s(&tm, &time);
                     ofs << "\n--- PRIMARY " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " ---\n";
@@ -270,7 +277,7 @@ int main(int argc, char* argv[]) {
                 if (ofs) {
                     auto now = std::chrono::system_clock::now();
                     auto time = std::chrono::system_clock::to_time_t(now);
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
                     std::tm tm;
                     localtime_s(&tm, &time);
                     ofs << "\n--- CLIPBOARD " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " ---\n";

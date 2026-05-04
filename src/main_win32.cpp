@@ -1,8 +1,11 @@
-#ifdef _WIN32
+#include "platform.h"
+
+#if PLATFORM_WINDOWS
 
 #include "service_win32.h"
 #include <iostream>
 #include <string>
+#include <vector>
 #include <thread>
 #include <chrono>
 
@@ -24,6 +27,27 @@ void PrintUsage() {
     std::wcout << L"  selection-logger.exe manual      - Manual mode: Ctrl+C to save, Ctrl+Q to exit" << std::endl;
     std::wcout << L"  selection-logger.exe auto        - Auto mode: continuous monitoring every second" << std::endl;
     std::wcout << L"  selection-logger.exe             - Run as service (called by SCM)" << std::endl;
+}
+
+/// Holds both the string storage and char* pointers, ensuring data lifetime.
+struct ConvertedArgs {
+    std::vector<std::string> storage;
+    std::vector<char*> ptrs;
+};
+
+/// Convert wchar_t** to NULL-terminated char** for ConsoleMain
+ConvertedArgs ConvertArgs(int argc, wchar_t* argv[]) {
+    ConvertedArgs result;
+    result.storage.resize(argc + 1);
+    result.ptrs.resize(argc + 1);
+    for (int i = 0; i < argc; i++) {
+        int size = WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, NULL, 0, NULL, NULL);
+        result.storage[i].resize(size - 1);
+        WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, result.storage[i].data(), size, NULL, NULL);
+        result.ptrs[i] = result.storage[i].data();
+    }
+    result.ptrs[argc] = nullptr;
+    return result;
 }
 
 int wmain(int argc, wchar_t* argv[]) {
@@ -56,23 +80,8 @@ int wmain(int argc, wchar_t* argv[]) {
             return QueryServiceStatus() ? 0 : 1;
         }
         else if (command == L"run" || command == L"manual") {
-            // Convert wchar_t** to char** for console main
-            char** charArgs = new char*[argc];
-            for (int i = 0; i < argc; i++) {
-                int size = WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, NULL, 0, NULL, NULL);
-                charArgs[i] = new char[size];
-                WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, charArgs[i], size, NULL, NULL);
-            }
-
-            int result = ConsoleMain(argc, charArgs);
-
-            // Cleanup
-            for (int i = 0; i < argc; i++) {
-                delete[] charArgs[i];
-            }
-            delete[] charArgs;
-
-            return result;
+            auto args = ConvertArgs(argc, argv);
+            return ConsoleMain(argc, args.ptrs.data());
         }
         else if (command == L"auto") {
             // Auto mode: continuous monitoring
@@ -105,23 +114,8 @@ int wmain(int argc, wchar_t* argv[]) {
             std::wcout << L"Use 'selection-logger.exe install' to install as service" << std::endl;
 
             // Convert to char** for console main
-            char** charArgs = new char*[argc + 1];
-            for (int i = 0; i < argc; i++) {
-                int size = WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, NULL, 0, NULL, NULL);
-                charArgs[i] = new char[size];
-                WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, charArgs[i], size, NULL, NULL);
-            }
-            charArgs[argc] = nullptr;
-
-            int result = ConsoleMain(argc, charArgs);
-
-            // Cleanup
-            for (int i = 0; i < argc; i++) {
-                delete[] charArgs[i];
-            }
-            delete[] charArgs;
-
-            return result;
+            auto args = ConvertArgs(argc, argv);
+            return ConsoleMain(argc, args.ptrs.data());
         }
         else {
             std::wcerr << L"Failed to start service control dispatcher: " << error << std::endl;
@@ -253,4 +247,4 @@ bool QueryServiceStatus() {
     return true;
 }
 
-#endif // _WIN32
+#endif // PLATFORM_WINDOWS

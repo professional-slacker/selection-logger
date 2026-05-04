@@ -1,4 +1,6 @@
-#ifdef _WIN32
+#include "platform.h"
+
+#if PLATFORM_WINDOWS
 
 #include "service_win32.h"
 #include <iostream>
@@ -291,4 +293,4 @@ int ConsoleMain(int argc, char* argv[]) {
     return 0;
 }
 
-#endif // _WIN32
+#endif // PLATFORM_WINDOWS

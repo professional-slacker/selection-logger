@@ -6,7 +6,7 @@
 // Win32 API compatible interface for clipboard access
 // This provides a unified interface that works on both Windows and Linux
 
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     // Native Windows includes
     #include <windows.h>
 #else

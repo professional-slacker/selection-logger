@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstring>
 
-#ifndef _WIN32
+#if !PLATFORM_WINDOWS
 // Linux implementation of Win32 clipboard API using xclip
 
 bool OpenClipboard(void* hWndNewOwner) {
@@ -60,7 +60,7 @@ bool CloseClipboard() {
 
 // Cross-platform implementation
 std::string GetClipboardTextCompat() {
-#ifdef _WIN32
+#if PLATFORM_WINDOWS
     // Native Windows implementation
     if (!OpenClipboard(nullptr)) {
         return "";
