@@ -1,0 +1,2 @@
+7a64ed8fe62152f405fc892492f0c390f644e733e45ce0e5d8393450f63999ec  selection-logger-windows-1.0.0.zip
+ecaa6b9e5158458aa936cb5e3b5f4035f7860f88536800561d5e66bcbcce8041  selection-logger-linux-1.0.0.tar.gz
