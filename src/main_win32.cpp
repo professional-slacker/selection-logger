@@ -42,9 +42,10 @@ ConvertedArgs ConvertArgs(int argc, wchar_t* argv[]) {
     result.ptrs.resize(argc + 1);
     for (int i = 0; i < argc; i++) {
         int size = WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, NULL, 0, NULL, NULL);
-        result.storage[i].resize(size - 1);
-        WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, result.storage[i].data(), size, NULL, NULL);
-        result.ptrs[i] = result.storage[i].data();
+        result.storage[i].resize(size);
+        WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, &result.storage[i][0], size, NULL, NULL);
+        result.storage[i].resize(size - 1);  // remove null terminator
+        result.ptrs[i] = &result.storage[i][0];
     }
     result.ptrs[argc] = nullptr;
     return result;
